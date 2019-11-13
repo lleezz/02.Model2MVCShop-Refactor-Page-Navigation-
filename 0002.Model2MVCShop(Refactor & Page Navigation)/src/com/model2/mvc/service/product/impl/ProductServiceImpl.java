@@ -26,8 +26,7 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	public Product getProduct(int prodNo) throws Exception {
-//		return productDao.findProduct(prodNo);
-		return null;
+		return productDao.findProduct(prodNo);
 	}
 
 	public Map<String, Object> getProductList(Search search) throws Exception {
@@ -36,9 +35,8 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	public Product updateProduct(Product product) throws Exception {
-//		productDao.updateProduct(product);
-//		return product;
-		return null;
+		productDao.updateProduct(product);
+		return product;
 	}
 
 }

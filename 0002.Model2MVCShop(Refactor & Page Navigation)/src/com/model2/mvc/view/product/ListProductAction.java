@@ -32,6 +32,8 @@ public class ListProductAction extends Action {
 		int pageUnit = Integer.parseInt(getServletContext().getInitParameter("pageUnit"));
 		search.setPageSize(pageSize);
 		
+		System.out.println("\t\t\t 페이지 사이즈 확인: " + pageSize);
+		
 		/**/System.out.println(search);
 		
 		ProductService service = new ProductServiceImpl();
@@ -39,7 +41,7 @@ public class ListProductAction extends Action {
 		
 		Page resultPage = new Page(currentPage, ((Integer)map.get("totalCount")).intValue(), pageUnit, pageSize);
 		
-		//request.setAttribute("list", map.get("list"));
+		request.setAttribute("list", map.get("list"));
 		request.setAttribute("map", map);
 		request.setAttribute("search", search);
 		request.setAttribute("resultPage", resultPage);

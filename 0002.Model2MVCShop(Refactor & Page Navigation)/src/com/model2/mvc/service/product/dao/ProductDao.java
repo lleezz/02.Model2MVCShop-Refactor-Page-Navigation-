@@ -39,6 +39,29 @@ public class ProductDao {
 		
 		
 	}
+	
+	public Product findProduct(int prodNo) throws Exception {
+		Connection con = DBUtil.getConnection();
+		String sql = "SELECT prod_no, prod_name, prod_detail, manufacture_day, price, image_file, reg_date FROM product WHERE prod_no = ?";
+		
+		PreparedStatement pStmt = con.prepareStatement(sql);
+		pStmt.setInt(1, prodNo);
+		ResultSet rs = pStmt.executeQuery();
+		
+		Product product = new Product(); 
+		while(rs.next()) {
+			
+			product.setProdNo(rs.getInt("prod_no"));
+			product.setProdName(rs.getString("prod_name"));
+			product.setProdDetail(rs.getString("prod_detail"));
+			product.setPrice(rs.getInt("price"));
+			product.setManuDate(rs.getString("manufacture_day"));
+			product.setFileName(rs.getString("image_file"));
+			product.setRegDate(rs.getDate("reg_date"));
+		}
+		return product;
+		
+	}
 
 	public Map<String, Object> getProductList(Search search) throws Exception {
 		Connection con = DBUtil.getConnection();
@@ -54,14 +77,13 @@ public class ProductDao {
 		}
 		
 		sql += " ORDER BY prod_no";
-		
-		PreparedStatement pStmt = con.prepareStatement(sql);
 		System.out.println("ProductDAO:: Original SQL :: " + sql);
 		
 		int totalCount = this.getTotalCount(sql);		//전체 레코드 수 get
 		System.out.println("ProductDAO:: totalCount :: " + totalCount);
-		
 		sql = makeCurrentPageSql(sql, search);
+		
+		PreparedStatement pStmt = con.prepareStatement(sql);
 		ResultSet rs = pStmt.executeQuery();
 		
 		List<Product> list = new ArrayList<Product>();
@@ -89,6 +111,31 @@ public class ProductDao {
 		con.close();
 			
 		return map;
+	}
+	
+	
+	
+	
+	public void updateProduct(Product product) throws Exception {
+		
+		Connection con = DBUtil.getConnection();
+
+		String sql = "UPDATE product "
+						+ "SET prod_name=?, prod_detail=?, manufacture_day=?, price=?, image_file=? "
+						+ "WHERE prod_no=?";
+		
+		PreparedStatement pStmt = con.prepareStatement(sql);
+		pStmt.setString(1, product.getProdName());
+		pStmt.setString(2, product.getProdDetail());
+		pStmt.setString(3, product.getManuDate());
+		pStmt.setInt(4, product.getPrice());
+		pStmt.setString(5, product.getFileName());
+		pStmt.setInt(6, product.getProdNo());
+
+		pStmt.executeUpdate();
+		
+		pStmt.close();
+		con.close();
 	}
 	
 	
@@ -129,17 +176,32 @@ public class ProductDao {
 		}
 	
 	
-//	public static void main(String args[]) throws Exception {
-//		
-//		ProductDao productDao = new ProductDao();
-//		Product product = new Product();
-//		
+	public static void main(String args[]) throws Exception {
+		
+		ProductDao productDao = new ProductDao();
+		Product product = new Product();
+		
 //		product.setProdName("카누 디카페인");
 //		product.setProdDetail("밤에 마시기 좋아요");
 //		product.setManuDate("2019-11-01");
 //		product.setPrice(10000);
 //		
 //		productDao.insertProduct(product);
-//	}
+		
+		Search search = new Search();
+		
+		List<Product> list = new ArrayList<Product>();
+		Map<String, Object> map = new HashMap<String, Object>();
+		map = productDao.getProductList(search);
+		list = (List<Product>) map.get("list");
+		System.out.println(list);
+		
+		for(int i = 0; i < list.size(); i++) {
+			System.out.println("map list: " + list.get(i));
+		}
+		
+		
+		
+	}
 
 }

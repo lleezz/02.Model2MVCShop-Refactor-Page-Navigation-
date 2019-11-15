@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.model2.mvc.common.Page;
 import com.model2.mvc.common.Search;
 import com.model2.mvc.framework.Action;
 import com.model2.mvc.service.domain.User;
@@ -24,12 +25,29 @@ public class ListPurchaseAction extends Action {
 		
 		Search search = new Search();
 		
-		PurchaseService purchaseService = new PurchaseServiceImpl();
+		int currentPage=1;
+
+		if(request.getParameter("currentPage") != null){
+			currentPage=Integer.parseInt(request.getParameter("currentPage"));
+		}
+		search.setCurrentPage(currentPage);
 		
-		Map<String, Object> map = new HashMap<String, Object>();
-		map = purchaseService.getPurchaseList(search, buyerId);
+		
+		// web.xml  meta-data 로 부터 상수 추출 
+		int pageSize = Integer.parseInt( getServletContext().getInitParameter("pageSize"));		//3
+		int pageUnit  =  Integer.parseInt(getServletContext().getInitParameter("pageUnit"));	//5
+		search.setPageSize(pageSize);
+		
+		PurchaseService purchaseService = new PurchaseServiceImpl();
+		Map<String, Object> map = purchaseService.getPurchaseList(search, buyerId);
+
+		Page resultPage	= 
+				new Page( currentPage, ((Integer)map.get("totalCount")).intValue(), pageUnit, pageSize);	
+		System.out.println("ListUserAction ::"+resultPage);	//( 현재페이지, 전체 건수, 5, 3 )
 		
 		request.setAttribute("map", map);
+		request.setAttribute("resultPage", resultPage);
+		request.setAttribute("search", search);
 		
 		return "forward:/purchase/listPurchase.jsp";
 	}

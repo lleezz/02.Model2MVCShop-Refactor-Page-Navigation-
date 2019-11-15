@@ -52,14 +52,14 @@ public class PurchaseDao {
 		Connection con = DBUtil.getConnection();
 		System.out.println("가가가ㅏ가가가가ㅏ가ㅏ가가가가 " + buyerId);
 		
-		String sql = "SELECT prod_no, user_id, receiver_name, receiver_phone, tran_status_code FROM users, transaction WHERE users.user_id = transaction.buyer_id AND user_id = ? ORDER BY tran_no";
+		String sql = "SELECT prod_no, user_id, receiver_name, receiver_phone, tran_status_code FROM users, transaction WHERE users.user_id = transaction.buyer_id AND users.user_id ='" + 
+					buyerId + "' ORDER BY tran_no";
 		
 		int totalCount = this.getTotalCount(sql);		//전체 레코드 수 get
 		System.out.println("PurchaseDAO:: totalCount :: " + totalCount);
 		sql = makeCurrentPageSql(sql, search);
 		
 		PreparedStatement pStmt = con.prepareStatement(sql);
-		pStmt.setString(1, buyerId);
 		
 		ResultSet rs = pStmt.executeQuery();
 		

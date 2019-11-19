@@ -2,7 +2,7 @@
 <%@ page import="com.model2.mvc.service.domain.*" %>
 
 <%
-	Purchase vo = (Purchase)request.getAttribute("vo");
+	Purchase vo = (Purchase)request.getAttribute("purchase");
 %>
 
 <%

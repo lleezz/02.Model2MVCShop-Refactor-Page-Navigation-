@@ -2,7 +2,7 @@
 <%@page import="com.model2.mvc.common.Page"%>
 <%@page import="com.model2.mvc.common.util.CommonUtil"%>
 <%@page import="com.model2.mvc.service.domain.User"%>
-<%@page import="com.model2.mvc.service.domain.Product"%>
+<%@page import="com.model2.mvc.service.domain.Purchase"%>
 
 <%@ page contentType="text/html; charset=euc-kr" %>
 
@@ -11,33 +11,19 @@
 
 <%
 	Map<String,Object> map = (Map<String,Object>)request.getAttribute("map");
-	List<Product> list = (List<Product>)map.get("list");
+	List<Purchase> list = (List<Purchase>)map.get("list");
 
 	Page resultPage = (Page)request.getAttribute("resultPage");
 	Search search =(Search)request.getAttribute("search");
 	String menu = request.getParameter("menu");
 	
-	/**/System.out.println("** listProduct.jsp ---- START :: menu="+request.getParameter("menu"));
+	
 	
 	// null ===> ""(nullString)으로 변경
 	String searchCondition = CommonUtil.null2str(search.getSearchCondition());
 	String searchKeyword = CommonUtil.null2str(search.getSearchKeyword());
 	
-	//search 조건 유지 ****** 한글 인코딩 오류.....
-	/*
-	String searchMain = null;
-	if(search.getSearchCondition()!=null && search.getSearchKeyword()!=null){
-		searchMain = "&searchCondition="+search.getSearchCondition()+"&searchKeyword="+search.getSearchKeyword();
-	}
-	System.out.println("  searchMain :: "+searchMain);
-	*/
-	
-	//admin or manager (role = admin) :: 상품목록 갔을때.. 재고없음 or 판매상태
-	String userRole = null;
-	//HttpSession session =request.getSession();	//세션에서 로그인 한 상태의 유저정보 가져오기 => 내장객체로 JSP에선 필요없는 문장이 됨
-	if( session.getAttribute("user")!=null ) {
-		userRole = ( (User)session.getAttribute("user") ).getRole();
-	}
+
 %>
 
 <html>
@@ -58,7 +44,7 @@ function fncGetUserList(currentPage){
 
 <div style="width:98%; margin-left:10px;">
 
-<form name="detailForm" action="/listProduct.do?menu=<%=menu%>" method="post">
+<form name="detailForm" action="/listSale.do" method="post">
 
 <table width="100%" height="37" border="0" cellpadding="0"	cellspacing="0">
 	<tr>
@@ -68,17 +54,7 @@ function fncGetUserList(currentPage){
 		<td background="/images/ct_ttl_img02.gif" width="100%" style="padding-left:10px;">
 			<table width="100%" border="0" cellspacing="0" cellpadding="0">
 				<tr>
-					<%
-						if(menu.equals("manage")){
-					%>
-						<td width="93%" class="ct_ttl01">상품 관리</td>
-					<%
-						}else if(menu.equals("search")){
-					%>
-						<td width="93%" class="ct_ttl01">상품 목록조회</td>
-					<%
-						}
-					%>
+					판매 상품 목록
 				</tr>
 			</table>
 		</td>
@@ -95,22 +71,6 @@ function fncGetUserList(currentPage){
 				<option value="0" <%= (searchCondition.equals("0") ? "selected" : "")%>>상품번호</option>
 				<option value="1" <%= (searchCondition.equals("1") ? "selected" : "")%>>상품명</option>
 				<option value="2" <%= (searchCondition.equals("2") ? "selected" : "")%>>상품가격</option>
-
-				<%-- 
-				<%	if(search.getSearchCondition().equals("0")){ %>
-						<option value="0" selected>상품번호</option>
-						<option value="1">상품명</option>
-						<option value="2">상품가격</option>
-				<%	}else if(search.getSearchCondition().equals("1")) { %>
-						<option value="0">상품번호</option>
-						<option value="1" selected>상품명</option>
-						<option value="2">상품가격</option>
-				<%	}else{ %>
-						<option value="0">상품번호</option>
-						<option value="1">상품명</option>
-						<option value="2" selected>상품가격</option>
-				<%	} %>
-				--%>
 			</select>
 			<input 	type="text" name="searchKeyword"  value="<%= searchKeyword %>" 
 							class="ct_input_g" style="width:200px; height:19px" >
@@ -154,18 +114,18 @@ function fncGetUserList(currentPage){
 	</tr>
 	<%
 		for(int i=0; i<list.size(); i++) {
-		Product vo = (Product)list.get(i);
+		Purchase vo = (Purchase )list.get(i);
 	%>
 	<tr class="ct_list_pop">
 		<td align="center"><%= i+1 %></td>
 		<td></td>
 		<td align="left">
-			<a href="/getProduct.do?prodNo=<%=vo.getProdNo()%>&menu=<%=menu%>"><%= vo.getProdName() %></a>
+			<a href="/getProduct.do?prodNo=<%=vo.getPurchaseProd().getProdNo()%>&menu=search"><%= vo.getPurchaseProd().getProdName() %></a>
 		</td>
 		<td></td>
-		<td align="left"><%= vo.getPrice() %></td>
+		<td align="left"><%= vo.getPurchaseProd().getPrice() %></td>
 		<td></td>
-		<td align="left"><%=vo.getRegDate() %></td>
+		<td align="left"><%=vo.getPurchaseProd().getRegDate() %></td>
 		<td></td>
 		<td align="left">
 			<%-- <% if(vo.getProTranCode().equals("sale")){ %>
@@ -188,17 +148,19 @@ function fncGetUserList(currentPage){
 					재고 없음
 				<% } %>
 			<% } %> --%>
+			
 			<%
-			if(vo.getProTranCode() != null) {
-				if(vo.getProTranCode().trim().equals("1")) {
+			if(vo.getTranCode() != null) {
+				if(vo.getTranCode().trim().equals("1")) {
 			%>
 				판매완료
+				<a href="/updateTranCode.do?tranNo=<%=vo.getTranNo()%>&tranCode=2">배송하기</a>
 				
-				<% } else if(vo.getProTranCode().trim().equals("2")) { %>
+				<% } else if(vo.getTranCode().trim().equals("2")) { %>
 				
 				배송중
 			
-				<% } else if(vo.getProTranCode().trim().equals("3")) { %>
+				<% } else if(vo.getTranCode().trim().equals("3")) { %>
 				
 				배송완료
 				
@@ -206,6 +168,8 @@ function fncGetUserList(currentPage){
 			<% } else {%>
 				판매중		
 			<% } %>
+						
+			
 			<%-- 
 			<% if(vo.getProTranCode().equals("sale")){ %>
 				판매중
@@ -232,24 +196,7 @@ function fncGetUserList(currentPage){
 
 <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-top:10px;">
 	<tr>
-		<td align="center">
-		
-			<%-- <input type="hidden" id="currentPage" name="currentPage" value=""/>
-				<% if( resultPage.getCurrentPage() > resultPage.getPageUnit() ){ %>
-					<!--  <a href="javascript:fncGetUserList('<%=resultPage.getCurrentPage()-1%>')">◀ 이전</a> -->
-					<a href="javascript:fncGetProductList('<%=((resultPage.getCurrentPage()-1)/resultPage.getPageUnit())*resultPage.getPageUnit()%>')">◀ 이전</a>
-				<% } %>
-				
-				<% for(int i=resultPage.getBeginUnitPage(); i<=resultPage.getEndUnitPage(); i++){ %>
-					<a href="javascript:fncGetProductList('<%=i %>');"><%=i %></a>
-				<% } %>
-				
-				<% if( (resultPage.getCurrentPage()-1)/resultPage.getPageUnit() < (resultPage.getMaxPage()-1)/resultPage.getPageUnit() ){ %>
-					<!--  <a href="javascript:fncGetUserList('<%=resultPage.getEndUnitPage()+1%>')">이후 ▶</a> -->
-					<a href="javascript:fncGetProductList('<%=((resultPage.getCurrentPage()-1)/resultPage.getPageUnit()+1)*resultPage.getPageUnit()+1%>')">이후 ▶</a>
-				<% } %> --%>
-				
-				
+		<td align="center">		
 				
 			<input type="hidden" id="currentPage" name="currentPage" value=""/>
 			<% if( resultPage.getCurrentPage() <= resultPage.getPageUnit() ){ %>

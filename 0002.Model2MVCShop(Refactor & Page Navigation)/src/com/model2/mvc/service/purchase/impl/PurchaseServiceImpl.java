@@ -23,8 +23,8 @@ public class PurchaseServiceImpl implements PurchaseService {
 
 	@Override
 	public Purchase getPurchase(int tranNo) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		
+		return purchaseDao.findPurchase(tranNo);
 	}
 
 	@Override
@@ -41,19 +41,19 @@ public class PurchaseServiceImpl implements PurchaseService {
 
 	@Override
 	public Map<String, Object> getSaleList(Search search) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		
+		return purchaseDao.getSaleList(search);
 	}
 
 	@Override
-	public Purchase updatePurcahse(Purchase purchase) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+	public void updatePurcahse(Purchase purchase) throws Exception {
+
+		purchaseDao.updatePurchase(purchase);
 	}
 
 	@Override
 	public void updateTranCode(Purchase purchase) throws Exception {
-		// TODO Auto-generated method stub
+		purchaseDao.updateTranCode(purchase);
 
 	}
 

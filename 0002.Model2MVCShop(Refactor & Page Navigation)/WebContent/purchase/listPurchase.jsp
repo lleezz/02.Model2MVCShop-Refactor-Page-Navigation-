@@ -126,7 +126,8 @@ function fncGetPurchaseList(currentPage){
 		<td></td>
 		<td align="left"><%= vo.getReceiverPhone() %></td>
 		<td></td>
-		<td align="left">현재
+		<td align="left">
+		<%-- 현재
 		<% if(vo.getTranCode().equals("sale")){ %>
 				판매중
 		<% } else if(vo.getTranCode().trim().equals("1")) {%>
@@ -138,13 +139,34 @@ function fncGetPurchaseList(currentPage){
 		<% } else {%>
 				tran_status_code 오류
 		<% } %>
-		상태 입니다.</td>	
+		상태 입니다. --%>
+		
+		<%
+			if(vo.getTranCode() != null) {
+				if(vo.getTranCode().trim().equals("1")) {
+			%>
+				판매완료
+				
+				
+				<% } else if(vo.getTranCode().trim().equals("2")) { %>
+				
+				배송중
+				<a href="/updateTranCode.do?tranNo=<%=vo.getTranNo()%>&tranCode=3">물건도착</a>
+				<% } else if(vo.getTranCode().trim().equals("3")) { %>
+				
+				배송완료
+				
+				<% } %>
+			<% } else {%>
+				판매중		
+			<% } %>
+		</td>	
 		<td></td>
-		<td align="left">
+		<%-- <td align="left">
 			<% if( vo.getTranCode().trim().equals("2") ){ %>
 				<a href="/updateTranCode.do?tranNo=<%=vo.getTranNo()%>&tranCode=3">물건도착</a>
 			<% } %>
-		</td>			
+		</td>	 --%>		
 	</tr>
 	<tr>
 		<td colspan="11" bgcolor="D6D7D6" height="1"></td>

@@ -66,14 +66,14 @@ public class ProductDao {
 	public Map<String, Object> getProductList(Search search) throws Exception {
 		Connection con = DBUtil.getConnection();
 		
-		String sql = "SELECT prod_no, prod_name, prod_detail, manufacture_day, price, image_file, reg_date FROM product";
+		String sql = "SELECT p.prod_no, prod_name, prod_detail, manufacture_day, price, image_file, reg_date, tran_status_code FROM product p, transaction t WHERE p.prod_no = t.prod_no(+)";
 		if(search.getSearchCondition() != null) {
 			if(search.getSearchCondition().equals("0") && !search.getSearchKeyword().equals(""))
-			sql += " WHERE prod_no LIKE'%" + search.getSearchKeyword() + "%'";
+			sql += " AND prod_no LIKE'%" + search.getSearchKeyword() + "%'";
 			if(search.getSearchCondition().equals("1") && !search.getSearchKeyword().equals(""))
-				sql += " WHERE prod_name LIKE'%" + search.getSearchKeyword() + "%'";
+				sql += " AND prod_name LIKE'%" + search.getSearchKeyword() + "%'";
 			if(search.getSearchCondition().equals("2") && !search.getSearchKeyword().equals(""))
-				sql += " WHERE price <=" + search.getSearchKeyword();
+				sql += " AND price <=" + search.getSearchKeyword();
 		}
 		
 		sql += " ORDER BY prod_no";
@@ -98,6 +98,7 @@ public class ProductDao {
 			product.setManuDate(rs.getString("manufacture_day"));
 			product.setFileName(rs.getString("image_file"));
 			product.setRegDate(rs.getDate("reg_date"));
+			product.setProTranCode(rs.getString("tran_status_code"));
 			
 			list.add(product);
 			

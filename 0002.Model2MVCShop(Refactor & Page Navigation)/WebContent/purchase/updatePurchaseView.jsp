@@ -174,7 +174,7 @@ function resetData() {
 
 			<input 	type="text" name="dlvyDate" 
 					<% if(vo.getDivyDate()!=null){ %>
-						value="<%=vo.getDivyDate() %>" 
+						value="<%=vo.getDivyDate()%>" 
 					<% } %>
 						class="ct_input_g" 
 							style="width:100px; height:19px"  maxLength="20"  /> 
